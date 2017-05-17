@@ -11,22 +11,26 @@ function validate_session_booking_form_alter(&$form, &$form_state, $form_id) {
 
 function validate_session_booking_form_validate($form, &$form_state) {
   // get defaults
-  $defaultTime = isset($form['field_schedate'][LANGUAGE_NONE]['#default_value'][0]) ? $form['field_date'][LANGUAGE_NONE]['#default_value'][0] : NULL;
+  $defaultDate = isset($form['field_scheduled_date'][LANGUAGE_NONE]['#default_value'][0]) ? $form['field_scheduled_date'][LANGUAGE_NONE]['#default_value'][0] : NULL;
   $defaultRoom = isset($form['field_room'][LANGUAGE_NONE]['#default_value']) ? $form['field_room'][LANGUAGE_NONE]['#default_value'] : NULL;
+  $defaultSlot = isset($form['field_timeslot'][LANGUAGE_NONE]['#default_value']) ? $form['field_timeslot'][LANGUAGE_NONE]['#default_value'] : NULL;
 
   // get submitted values
-  $time = $form_state['values']['field_schedate'][LANGUAGE_NONE][0]['value'];
+  $date = $form_state['values']['field_scheduled_date'][LANGUAGE_NONE][0]['value'];
   $room = $form_state['values']['field_room'][LANGUAGE_NONE][0]['target_id'];
-  if (($defaultTime != $time) || ($defaultRoom != $room)) {
+  $slot = $form_state['values']['field_timeslot'][LANGUAGE_NONE][0]['target_id'];
+
+  if (($defaultDate != $date) || ($defaultRoom != $room) || ($defaultSlot != $slot)) {
     $query = new EntityFieldQuery();
     $query->entityCondition('entity_type', 'node')
       ->entityCondition('bundle', 'session')
-      ->fieldCondition('field_schedate', 'value', $time, '=')
-      ->fieldCondition('field_room', 'target_id', $room, '=');
+      ->fieldCondition('field_scheduled_date', 'value', $date, '=')
+      ->fieldCondition('field_room', 'target_id', $room, '=')
+      ->fieldCondition('field_slot', 'target_id', $slot, '=');
 
     $result = $query->execute();
     if (isset($result['node'])) {
-      form_set_error('field_schedate', t('This room has already been booked for the same time.'));
+      form_set_error('field_room', t('This room has already been booked for the same timeslot on the same day.'));
     }
   }
 }
