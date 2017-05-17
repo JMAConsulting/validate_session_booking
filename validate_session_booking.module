@@ -26,7 +26,7 @@ function validate_session_booking_form_validate($form, &$form_state) {
       ->entityCondition('bundle', 'session')
       ->fieldCondition('field_scheduled_date', 'value', $date, '=')
       ->fieldCondition('field_room', 'target_id', $room, '=')
-      ->fieldCondition('field_slot', 'target_id', $slot, '=');
+      ->fieldCondition('field_timeslot', 'target_id', $slot, '=');
 
     $result = $query->execute();
     if (isset($result['node'])) {
